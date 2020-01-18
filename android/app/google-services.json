@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "391036638742",
+    "firebase_url": "https://o-taxi-app.firebaseio.com",
+    "project_id": "o-taxi-app",
+    "storage_bucket": "o-taxi-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:391036638742:android:7256573be20c1484268737",
+        "android_client_info": {
+          "package_name": "com.example.o_taxi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "391036638742-r56tijlueqr2p5kdrnf45e4jctiaotfr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.o_taxi",
+            "certificate_hash": "e46d007c571422e5bc12381cf1afd6222565348c"
+          }
+        },
+        {
+          "client_id": "391036638742-3cjka985fllh064u8ir8hbsbr0ra089j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSPkEu8jkhAHd6fpN0AwK0_sz4hzaudGk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "391036638742-3cjka985fllh064u8ir8hbsbr0ra089j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
