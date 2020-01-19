@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:o_taxi/states/app_state.dart';
+import 'package:provider/provider.dart';
 import '../requests/google_maps_requests.dart';
 import '../utils/core.dart';
 
@@ -31,22 +33,19 @@ class _MapState extends State<Map> {
 
   GoogleMapController mapController;
   GoogleMapsServices _googleMapsServices = GoogleMapsServices();
-  TextEditingController locationController = TextEditingController();
-  TextEditingController destinationController =TextEditingController();
-  static LatLng _initialPosition;
-  LatLng _lastPosition = _initialPosition;
+
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
 
   @override
   void initState() {
-    super.initState();
-    _getUserLocation();
+  super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _initialPosition == null? Container(
+    final appState = Provider.of<AppState>(context);
+    return appState.initialPosition == null? Container(
       alignment: Alignment.center,
       child: Center(
         child: CircularProgressIndicator(),
@@ -55,7 +54,7 @@ class _MapState extends State<Map> {
       children: <Widget>[
         GoogleMap(
          initialCameraPosition: CameraPosition(
-          target: _initialPosition, 
+          target: appState.initialPosition, 
           zoom: 10.0),
           onMapCreated: onCreated,
           myLocationEnabled: true,
@@ -63,6 +62,7 @@ class _MapState extends State<Map> {
           compassEnabled: true,
           markers: _markers,
           onCameraMove: _onCameraMove,
+          polylines: _polylines,
         ),
         Positioned(
           top: 50.0,
@@ -85,7 +85,7 @@ class _MapState extends State<Map> {
             ),
             child: TextField(
               cursorColor: Colors.black,
-              controller: locationController,
+              controller: appState.locationController,
               decoration: InputDecoration(
                 icon: Container(
                   margin: EdgeInsets.only(
@@ -124,12 +124,17 @@ class _MapState extends State<Map> {
             ),
             child: TextField(
               cursorColor: Colors.black,
+              controller: appState.locationController,
+              textInputAction: TextInputAction.go,
+              onSubmitted: (value) {
+                sendRequest(value);
+              },
               decoration: InputDecoration(
                 icon: Container(
                   margin: EdgeInsets.only(left: 20, top: 5), width: 10, height: 10,
                   child: Icon(Icons.local_taxi),
                 ),
-                hintText: "Destination",
+                hintText: "Destination?",
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.only(left: 15.0, top: 16.0)
               ),
@@ -158,22 +163,32 @@ class _MapState extends State<Map> {
   }
 
   void _onCameraMove(CameraPosition position) {
-    setState(() {
-      _lastPosition = position.target;
-    });
+    // setState(() {
+    //   _lastPosition = position.target;
+    // });
   }
 
-  void _onAddMarkerPressed() {
-    setState(() {
-      _markers.add(Marker(markerId: MarkerId(_lastPosition.toString()),
-      position: _lastPosition,
-      infoWindow: InfoWindow(
-        title: "Remember Here",
-        snippet: "Good Place"
-      ),
-      icon: BitmapDescriptor.defaultMarker
-      ));
-    });
+  void _addMarker(LatLng location, String address) {
+    // setState(() {
+    //   _markers.add(Marker(markerId: MarkerId(_lastPosition.toString()),
+    //   position: location,
+    //   infoWindow: InfoWindow(
+    //     title: address,
+    //     snippet: "go here",
+    //   ),
+    //   icon: BitmapDescriptor.defaultMarker
+    //   ));
+    // });
+  }
+
+  void createRoute(String encodedPoly) {
+    // setState(() {
+    //   _polylines.add(Polyline(polylineId: PolylineId(_lastPosition.toString()),
+    //   width: 10,
+    //   points: convertToLatLng(decodePoly(encodedPoly)),
+    //   color: Colors.red),
+    //   ); 
+    // });
   }
 
 // this method will convert list of doubles into latlng
@@ -223,12 +238,15 @@ class _MapState extends State<Map> {
     return lList;
   }
 
-  void _getUserLocation() async {
-    Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(position.latitude, position.longitude);
-    setState(() {
-      _initialPosition = LatLng(position.latitude, position.longitude);
-      locationController.text =placemark[0].name;
-    });
+
+  void sendRequest(String intendedLocation) async {
+    List<Placemark> placemark = await Geolocator().placemarkFromAddress(intendedLocation);
+    double latitude = placemark[0].position.latitude;
+    double longitude = placemark[0].position.longitude;
+    LatLng destination = LatLng(latitude, longitude);
+    _addMarker(destination, intendedLocation);
+    // String route = await _googleMapsServices.getRouteCoordinates(_initialPosition, destination);
+    // createRoute(route);
+
   }
 }
